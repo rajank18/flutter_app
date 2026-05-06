@@ -11,11 +11,17 @@ class EventModel extends HiveObject {
   DateTime eventDate;
   @HiveField(3)
   int maxCapacity;
+  @HiveField(4)
+  bool? isPublished;
+  @HiveField(5)
+  String? createdBy;
 
   EventModel({
     required this.id,
     required this.eventName,
     required this.eventDate,
     required this.maxCapacity,
+    this.isPublished = true,
+    this.createdBy,
   });
 }

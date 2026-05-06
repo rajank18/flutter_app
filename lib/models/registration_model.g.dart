@@ -1,47 +1,44 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'event_model.dart';
+part of 'registration_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class EventModelAdapter extends TypeAdapter<EventModel> {
+class RegistrationModelAdapter extends TypeAdapter<RegistrationModel> {
   @override
-  final int typeId = 0;
+  final int typeId = 3;
 
   @override
-  EventModel read(BinaryReader reader) {
+  RegistrationModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return EventModel(
+    return RegistrationModel(
       id: fields[0] as String,
-      eventName: fields[1] as String,
-      eventDate: fields[2] as DateTime,
-      maxCapacity: fields[3] as int,
-      isPublished: fields[4] as bool?,
-      createdBy: fields[5] as String?,
+      eventId: fields[1] as String,
+      eventName: fields[2] as String,
+      userEmail: fields[3] as String,
+      registeredAt: fields[4] as DateTime,
     );
   }
 
   @override
-  void write(BinaryWriter writer, EventModel obj) {
+  void write(BinaryWriter writer, RegistrationModel obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.eventName)
+      ..write(obj.eventId)
       ..writeByte(2)
-      ..write(obj.eventDate)
+      ..write(obj.eventName)
       ..writeByte(3)
-      ..write(obj.maxCapacity)
+      ..write(obj.userEmail)
       ..writeByte(4)
-      ..write(obj.isPublished)
-      ..writeByte(5)
-      ..write(obj.createdBy);
+      ..write(obj.registeredAt);
   }
 
   @override
@@ -50,7 +47,7 @@ class EventModelAdapter extends TypeAdapter<EventModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is EventModelAdapter &&
+      other is RegistrationModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

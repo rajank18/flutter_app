@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'dashboard_screen.dart';
-import 'checkin_screen.dart';
-import 'logs_screen.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 import '../routes/app_routes.dart';
+import 'event_setup_screen.dart';
+import 'home_screen.dart';
+import 'logs_screen.dart';
+import 'my_events_screen.dart';
 
 class MainNavShell extends StatefulWidget {
   const MainNavShell({super.key});
@@ -14,57 +17,62 @@ class MainNavShell extends StatefulWidget {
 class _MainNavShellState extends State<MainNavShell> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = const [
-    DashboardScreen(),
-    CheckinScreen(),
-    LogsScreen(),
-  ];
-
-  final List<String> _titles = const [
-    'Dashboard',
-    'Participant Check-in',
-    'Check-in Logs',
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    final isAdmin = auth.isAdmin;
+
+    final screens = isAdmin
+        ? <Widget>[
+            const HomeScreen(isAdmin: true),
+            const EventSetupScreen(),
+            const LogsScreen(),
+          ]
+        : <Widget>[
+            const HomeScreen(isAdmin: false),
+            const MyEventsScreen(),
+          ];
+
+    final titles = isAdmin
+        ? const ['Home', 'Add Event', 'Logs']
+        : const ['Home', 'My Events'];
+
+    final items = isAdmin
+        ? const [
+            BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Home'),
+            BottomNavigationBarItem(icon: Icon(Icons.add_circle_outline), label: 'Add Event'),
+            BottomNavigationBarItem(icon: Icon(Icons.receipt_long_outlined), label: 'Logs'),
+          ]
+        : const [
+            BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Home'),
+            BottomNavigationBarItem(icon: Icon(Icons.bookmark_border), label: 'My Events'),
+          ];
+
+    if (_selectedIndex >= screens.length) {
+      _selectedIndex = 0;
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(_titles[_selectedIndex]),
+        title: Text(titles[_selectedIndex]),
         centerTitle: true,
         actions: [
           IconButton(
-            tooltip: 'Event Setup',
-            onPressed: () => Navigator.pushNamed(context, AppRoutes.eventSetup),
-            icon: const Icon(Icons.settings),
+            tooltip: 'Logout',
+            onPressed: () {
+              context.read<AuthProvider>().logout();
+              Navigator.pushNamedAndRemoveUntil(context, AppRoutes.login, (route) => false);
+            },
+            icon: const Icon(Icons.logout),
           ),
         ],
       ),
-      body: IndexedStack(index: _selectedIndex, children: _screens),
+      body: IndexedStack(index: _selectedIndex, children: screens),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        onTap: (index) => setState(() => _selectedIndex = index),
         selectedItemColor: const Color(0xFF1463FF),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.qr_code_scanner),
-            label: 'Check-in',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt),
-            label: 'Logs',
-          ),
-        ],
+        items: items,
       ),
     );
   }

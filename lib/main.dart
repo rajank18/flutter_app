@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'routes/app_routes.dart';
+import 'providers/auth_provider.dart';
 import 'providers/event_provider.dart';
 import 'providers/attendance_provider.dart';
+import 'providers/registration_provider.dart';
 import 'services/hive_service.dart';
 
 void main() async {
@@ -18,7 +20,9 @@ class SmartEventApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => EventProvider()),
+        ChangeNotifierProvider(create: (_) => RegistrationProvider()),
         ChangeNotifierProvider(create: (_) => AttendanceProvider()),
       ],
       child: MaterialApp(

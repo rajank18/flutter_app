@@ -5,15 +5,20 @@ import '../services/hive_service.dart';
 import '../services/validation_service.dart';
 
 class EventProvider extends ChangeNotifier {
-	EventModel? _event;
+	List<EventModel> _events = [];
 	bool _loaded = false;
 
-	EventModel? get event => _event;
-	bool get hasEvent => _event != null;
+	List<EventModel> get events => _events;
+	EventModel? get event => _events.isEmpty ? null : _events.first;
+	EventModel? get latestEvent => _events.isEmpty ? null : _events.first;
+	List<EventModel> get publishedEvents => _events.where((event) => event.isPublished ?? true).toList(growable: false);
+	List<EventModel> eventsByCreator(String email) =>
+	    _events.where((event) => event.createdBy == email).toList(growable: false);
+	bool get hasEvent => _events.isNotEmpty;
 	bool get isLoaded => _loaded;
 
 	Future<void> initialize() async {
-		_event = HiveService.getCurrentEvent();
+		_events = HiveService.getEvents();
 		_loaded = true;
 		notifyListeners();
 	}
@@ -23,6 +28,8 @@ class EventProvider extends ChangeNotifier {
 		required DateTime? date,
 		required TimeOfDay? time,
 		required String capacityText,
+		bool isPublished = true,
+		String? createdBy,
 	}) async {
 		final validation = ValidationService.validateEventSetup(
 			eventName: eventName,
@@ -40,12 +47,28 @@ class EventProvider extends ChangeNotifier {
 			eventName: eventName.trim(),
 			eventDate: eventDateTime,
 			maxCapacity: capacity,
+			isPublished: isPublished,
+			createdBy: createdBy,
 		);
 
 		await HiveService.saveEvent(event);
-		_event = event;
+		_events = HiveService.getEvents();
 		notifyListeners();
 		return null;
+	}
+
+	Future<void> togglePublish(EventModel event, bool value) async {
+		final updated = EventModel(
+			id: event.id,
+			eventName: event.eventName,
+			eventDate: event.eventDate,
+			maxCapacity: event.maxCapacity,
+			isPublished: value,
+			createdBy: event.createdBy,
+		);
+		await HiveService.updateEvent(updated);
+		_events = HiveService.getEvents();
+		notifyListeners();
 	}
 }
 

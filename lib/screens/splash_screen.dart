@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
 import '../routes/app_routes.dart';
-import '../providers/event_provider.dart';
-import '../providers/attendance_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,25 +10,21 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  Future<void> _bootstrap() async {
-    final eventProvider = context.read<EventProvider>();
-    final attendanceProvider = context.read<AttendanceProvider>();
-
-    await eventProvider.initialize();
-    await attendanceProvider.initialize();
-
-    if (!mounted) return;
-
-    final nextRoute = eventProvider.hasEvent ? AppRoutes.dashboard : AppRoutes.eventSetup;
-    Navigator.pushReplacementNamed(context, nextRoute);
-  }
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 2), () {
-      _bootstrap();
+    _timer = Timer(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, AppRoutes.login);
     });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override

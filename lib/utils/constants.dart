@@ -2,6 +2,7 @@ class AppConstants {
   static const String eventBox = 'eventBox';
   static const String participantBox = 'participantBox';
   static const String checkinBox = 'checkinBox';
+  static const String registrationBox = 'registrationBox';
 
   static const List<Map<String, String>> dummyParticipants = [
     {'id': 'P001', 'name': 'Aarav Singh', 'qrCode': 'P001'},
