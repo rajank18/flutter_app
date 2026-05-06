@@ -1,6 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../models/event_model.dart';
 import '../utils/helpers.dart';
+
+// Web-only import for file download.
+// ignore: avoid_web_libraries_in_flutter
 
 class EventCard extends StatelessWidget {
   final EventModel event;
