@@ -23,13 +23,15 @@ class EventModelAdapter extends TypeAdapter<EventModel> {
       maxCapacity: fields[3] as int,
       isPublished: fields[4] as bool?,
       createdBy: fields[5] as String?,
+      // requiresSecureKey: fields[6] as bool,
+      // secureKey: fields[7] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, EventModel obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -41,7 +43,11 @@ class EventModelAdapter extends TypeAdapter<EventModel> {
       ..writeByte(4)
       ..write(obj.isPublished)
       ..writeByte(5)
-      ..write(obj.createdBy);
+      ..write(obj.createdBy)
+      ..writeByte(6)
+      ..write(obj.requiresSecureKey)
+      ..writeByte(7)
+      ..write(obj.registrationKey);
   }
 
   @override

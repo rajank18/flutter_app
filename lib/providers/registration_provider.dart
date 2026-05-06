@@ -28,11 +28,23 @@ class RegistrationProvider extends ChangeNotifier {
   Future<String?> registerToEvent({
     required EventModel event,
     required String userEmail,
+    String? registrationKeyInput,
   }) async {
     final normalizedEmail = userEmail.trim().toLowerCase();
 
     if (!event.isPublished!) {
       return 'This event is not published yet.';
+    }
+
+    if (event.requiresSecureKey) {
+      final input = (registrationKeyInput ?? '').trim();
+      if (input.isEmpty) return 'Please enter the 6-digit registration key.';
+      if (event.registrationKey == null) {
+      return 'This event is misconfigured (missing registration key).';
+      }
+      if (input != event.registrationKey) {
+        return 'Invalid registration key.';
+      }
     }
 
     if (isRegistered(eventId: event.id, userEmail: normalizedEmail)) {

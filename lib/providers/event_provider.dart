@@ -30,6 +30,7 @@ class EventProvider extends ChangeNotifier {
 		required String capacityText,
 		bool isPublished = true,
 		String? createdBy,
+		bool requiresSecureKey = false,
 	}) async {
 		final validation = ValidationService.validateEventSetup(
 			eventName: eventName,
@@ -42,6 +43,13 @@ class EventProvider extends ChangeNotifier {
 		final capacity = int.parse(capacityText.trim());
 		final eventDateTime = ValidationService.mergeDateTime(date!, time!);
 
+		String? key;
+		if (requiresSecureKey) {
+			// Generate a 6-digit key (as a zero-padded string).
+			final raw = DateTime.now().millisecondsSinceEpoch % 1000000;
+			key = raw.toString().padLeft(6, '0');
+		}
+
 		final event = EventModel(
 			id: const Uuid().v4(),
 			eventName: eventName.trim(),
@@ -49,6 +57,8 @@ class EventProvider extends ChangeNotifier {
 			maxCapacity: capacity,
 			isPublished: isPublished,
 			createdBy: createdBy,
+			requiresSecureKey: requiresSecureKey,
+			registrationKey: key,
 		);
 
 		await HiveService.saveEvent(event);
@@ -57,7 +67,7 @@ class EventProvider extends ChangeNotifier {
 		return null;
 	}
 
-	Future<void> togglePublish(EventModel event, bool value) async {
+Future<void> togglePublish(EventModel event, bool value) async {
 		final updated = EventModel(
 			id: event.id,
 			eventName: event.eventName,
@@ -65,6 +75,8 @@ class EventProvider extends ChangeNotifier {
 			maxCapacity: event.maxCapacity,
 			isPublished: value,
 			createdBy: event.createdBy,
+			requiresSecureKey: event.requiresSecureKey,
+			registrationKey: event.registrationKey,
 		);
 		await HiveService.updateEvent(updated);
 		_events = HiveService.getEvents();

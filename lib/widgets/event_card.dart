@@ -58,6 +58,13 @@ class EventCard extends StatelessWidget {
             Text(Helpers.formatDateTime(event.eventDate), style: const TextStyle(color: Colors.black54)),
             const SizedBox(height: 4),
             Text('Capacity: ${event.maxCapacity}', style: const TextStyle(color: Colors.black54)),
+            if (event.requiresSecureKey && (event.registrationKey?.isNotEmpty ?? false)) ...[
+              const SizedBox(height: 8),
+              Text(
+                'Secure Key: ${event.registrationKey}',
+                style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w700),
+              ),
+            ],
             const SizedBox(height: 8),
             Text(subtitle, style: const TextStyle(color: Colors.black87)),
             const SizedBox(height: 14),

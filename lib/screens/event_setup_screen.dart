@@ -7,7 +7,6 @@ import '../providers/event_provider.dart';
 import '../providers/auth_provider.dart';
 import '../utils/helpers.dart';
 
-
 class EventSetupScreen extends StatefulWidget {
   const EventSetupScreen({super.key});
 
@@ -22,6 +21,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
   TimeOfDay? _selectedTime;
   bool _isSaving = false;
   bool _isPublished = true;
+  bool _requiresSecureKey = false;
 
   void _pickDate() {
     showDatePicker(
@@ -43,12 +43,12 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
     ).then((date) {
       if (date == null) return;
       setState(() => _selectedDate = date);
-    );
+    });
   }
 
   void _pickTime() {
     showTimePicker(
-      context,
+      context: context,
       initialTime: _selectedTime ?? TimeOfDay.now(),
       helpText: 'Select event time',
       builder: (context, child) {
@@ -82,6 +82,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
           capacityText: _capacityController.text,
           isPublished: _isPublished,
           createdBy: context.read<AuthProvider>().email,
+          requiresSecureKey: _requiresSecureKey,
         );
 
     if (!mounted) return;
@@ -103,6 +104,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
       _selectedDate = null;
       _selectedTime = null;
       _isPublished = true;
+      _requiresSecureKey = false;
     });
   }
 
@@ -118,7 +120,8 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
     return Scaffold(
       body: Consumer<EventProvider>(
         builder: (context, eventProvider, _) {
-          final myEvents = eventProvider.eventsByCreator(context.read<AuthProvider>().email ?? '');
+          final myEvents =
+              eventProvider.eventsByCreator(context.read<AuthProvider>().email ?? '');
 
           return SafeArea(
             child: SingleChildScrollView(
@@ -153,7 +156,9 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                               Expanded(
                                 child: _PickerField(
                                   label: 'Date',
-                                  value: _selectedDate != null ? DateFormat('EEE, dd MMM').format(_selectedDate!) : 'Pick date',
+                                  value: _selectedDate != null
+                                      ? DateFormat('EEE, dd MMM').format(_selectedDate!)
+                                      : 'Pick date',
                                   icon: Icons.calendar_month,
                                   onTap: _pickDate,
                                 ),
@@ -162,7 +167,9 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                               Expanded(
                                 child: _PickerField(
                                   label: 'Time',
-                                  value: _selectedTime != null ? _selectedTime!.format(context) : 'Pick time',
+                                  value: _selectedTime != null
+                                      ? _selectedTime!.format(context)
+                                      : 'Pick time',
                                   icon: Icons.access_time,
                                   onTap: _pickTime,
                                 ),
@@ -184,6 +191,14 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                             subtitle: const Text('Visible to all users in Home'),
                             value: _isPublished,
                             onChanged: (value) => setState(() => _isPublished = value),
+                          ),
+                          const SizedBox(height: 8),
+                          SwitchListTile.adaptive(
+                            contentPadding: EdgeInsets.zero,
+                            title: const Text('Secure registration (6-digit key)'),
+                            subtitle: const Text('Users must enter the key to register'),
+                            value: _requiresSecureKey,
+                            onChanged: (value) => setState(() => _requiresSecureKey = value),
                           ),
                           const SizedBox(height: 8),
                           CustomButton(
@@ -221,18 +236,28 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: Text(event.eventName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+                                      child: Text(
+                                        event.eventName,
+                                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                                      ),
                                     ),
                                     Switch.adaptive(
                                       value: event.isPublished ?? true,
-                                      onChanged: (value) => context.read<EventProvider>().togglePublish(event, value),
+                                      onChanged: (value) =>
+                                          context.read<EventProvider>().togglePublish(event, value),
                                     ),
                                   ],
                                 ),
                                 const SizedBox(height: 6),
-                                Text(DateFormat('EEE, dd MMM yyyy • hh:mm a').format(event.eventDate), style: const TextStyle(color: Colors.black54)),
+                                Text(
+                                  DateFormat('EEE, dd MMM yyyy • hh:mm a').format(event.eventDate),
+                                  style: const TextStyle(color: Colors.black54),
+                                ),
                                 const SizedBox(height: 4),
-                                Text('Capacity: ${event.maxCapacity}', style: const TextStyle(color: Colors.black54)),
+                                Text(
+                                  'Capacity: ${event.maxCapacity}',
+                                  style: const TextStyle(color: Colors.black54),
+                                ),
                               ],
                             ),
                           ),
@@ -350,3 +375,4 @@ class _PickerField extends StatelessWidget {
     );
   }
 }
+

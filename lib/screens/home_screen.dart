@@ -47,9 +47,53 @@ class HomeScreen extends StatelessWidget {
                     onAction: isAdmin
                         ? null
                         : () async {
+                            String? keyInput;
+                            if (event.requiresSecureKey) {
+                              keyInput = await showDialog<String>(
+                                context: context,
+                                builder: (ctx) {
+                                  final controller = TextEditingController();
+                                  return AlertDialog(
+                                    title: const Text('Secure Registration'),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Text('Enter the 6-digit key to register.'),
+                                        const SizedBox(height: 12),
+                                        TextField(
+                                          controller: controller,
+                                          keyboardType: TextInputType.number,
+                                          maxLength: 6,
+                                          decoration: const InputDecoration(
+                                            labelText: '6-digit key',
+                                            border: OutlineInputBorder(),
+                                            counterText: '',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(ctx),
+                                        child: const Text('Cancel'),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () => Navigator.pop(ctx, controller.text.trim()),
+                                        child: const Text('Submit'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+
+                              if (!context.mounted) return;
+                              if (keyInput == null) return; // cancelled
+                            }
+
                             final message = await registrationProvider.registerToEvent(
                               event: event,
                               userEmail: email,
+                              registrationKeyInput: keyInput,
                             );
                             if (context.mounted) {
                               Helpers.showSnack(context, message ?? 'Registered successfully.');

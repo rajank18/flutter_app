@@ -148,18 +148,18 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: _loading ? () {} : _submit,
                           ),
                           const SizedBox(height: 16),
-                          Container(
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade50,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: const Text(
-                              'Admin: rajan@charusat.ac.in / 12345678\nUser: any @charusat.ac.in email with a valid 8+ character password',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 12, height: 1.5),
-                            ),
-                          ),
+                          // Container(
+                          //   padding: const EdgeInsets.all(14),
+                          //   decoration: BoxDecoration(
+                          //     color: Colors.blue.shade50,
+                          //     borderRadius: BorderRadius.circular(16),
+                          //   ),
+                          //   child: const Text(
+                          //     'Admin: rajan@charusat.ac.in / 12345678\nUser: any @charusat.ac.in email with a valid 8+ character password',
+                          //     textAlign: TextAlign.center,
+                          //     style: TextStyle(fontSize: 12, height: 1.5),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
